@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FixitPoint360 - Service Management",
-  description: "AMC, clients, jobs, staff, income/expense and ledger management for FixitPoint360",
+  title: "FixitPoint360 - Complete IT & Home Services",
+  description:
+    "CCTV, computer, printer repair, cartridge refilling, household services and AMC plans. Trusted IT & home services in Beohari, Shahdol (MP).",
 };
 
 export default function RootLayout({
