@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Wrench, LogIn, Languages, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { Wrench, LogIn, Languages, Loader2, Globe } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { Button, Input, Field, Card } from "@/components/ui";
@@ -79,12 +80,14 @@ export default function LoginPage() {
           </form>
         </Card>
 
-        <div className="mt-4 space-y-1 rounded-lg bg-white/70 px-4 py-3 text-xs text-slate-500">
-          <p>👤 {t("ownerLogin")}</p>
-          <p>👥 {t("staffLogin")}</p>
-        </div>
-
-        <div className="mt-4 text-center">
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+          >
+            <Globe className="h-4 w-4" />
+            {t("goToWebsite")}
+          </Link>
           <button
             onClick={() => setLang(lang === "en" ? "hi" : "en")}
             className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"

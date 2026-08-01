@@ -14,9 +14,8 @@ const dict = {
   password: { en: "Password", hi: "पासवर्ड" },
   signIn: { en: "Sign In", hi: "साइन इन" },
   signingIn: { en: "Signing in...", hi: "साइन इन हो रहा है..." },
+  goToWebsite: { en: "Go to website", hi: "वेबसाइट पर जाएँ" },
   wrongCredentials: { en: "Invalid email or password", hi: "गलत ईमेल या पासवर्ड" },
-  ownerLogin: { en: "Owner: sanjaykumarpatel613@gmail.com / owner123", hi: "मालिक: sanjaykumarpatel613@gmail.com / owner123" },
-  staffLogin: { en: "Staff: ramesh@fixitpoint360.com / staff123", hi: "स्टाफ: ramesh@fixitpoint360.com / staff123" },
 
   dashboard: { en: "Dashboard", hi: "डैशबोर्ड" },
   clients: { en: "Clients", hi: "ग्राहक" },
