@@ -35,7 +35,7 @@ export default function TaDaPage() {
     jobId: "",
   });
 
-  if (session?.role !== "owner") {
+  if (session?.role === "staff") {
     return (
       <div className="py-20 text-center">
         <EmptyState message={t("noRecords")} />

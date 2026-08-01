@@ -8,6 +8,7 @@ import { useStore } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
 import { SERVICE_CATEGORIES, JOB_STATUSES, PRIORITIES, PAYMENT_MODES } from "@/lib/constants";
 import { money, formatDate } from "@/lib/format";
+import { canManage } from "@/lib/roles";
 import {
   Button,
   Card,
@@ -122,7 +123,7 @@ function JobsInner() {
         title={t("jobList")}
         subtitle={`${jobs.length} ${t("total").toLowerCase()}`}
         action={
-          session?.role === "owner" && (
+          session && canManage(session.role) && (
             <Button onClick={() => openAdd()}>
               <Plus className="h-4 w-4" />
               {t("addJob")}
@@ -217,7 +218,7 @@ function JobsInner() {
                           <Link href={`/app/jobs/${j.id}`} className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100">
                             <Eye className="h-4 w-4" />
                           </Link>
-                          {session?.role === "owner" && (
+                          {session && canManage(session.role) && (
                             <>
                               <button onClick={() => openEdit(j)} className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100">
                                 <Pencil className="h-4 w-4" />

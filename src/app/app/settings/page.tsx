@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Save, RefreshCcw, Building2, Languages } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
+import { roleLabel } from "@/lib/roles";
 import { Button, Card, CardHeader, Input, Field, PageTitle, EmptyState } from "@/components/ui";
 
 export default function SettingsPage() {
@@ -105,7 +106,7 @@ export default function SettingsPage() {
             <CardHeader title={t("profile")} />
             <div className="p-4">
               <p className="text-sm text-slate-600">
-                {session.name} ({session.role}) — {session.email}
+                {session.name} ({roleLabel(session.role, lang)}) — {session.email}
               </p>
             </div>
           </Card>

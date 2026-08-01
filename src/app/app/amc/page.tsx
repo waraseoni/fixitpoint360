@@ -7,6 +7,7 @@ import { useStore } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
 import { SERVICE_CATEGORIES } from "@/lib/constants";
 import { money, formatDate } from "@/lib/format";
+import { canManage } from "@/lib/roles";
 import {
   Button,
   Card,
@@ -89,7 +90,7 @@ export default function AmcPage() {
         title={t("amcList")}
         subtitle={`${amcs.filter((a) => a.status === "active").length} ${t("active").toLowerCase()}`}
         action={
-          session?.role === "owner" && (
+          session && canManage(session.role) && (
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" />
               {t("addAMC")}
@@ -148,7 +149,7 @@ export default function AmcPage() {
                   </div>
                 </div>
                 {a.notes && <p className="mt-2 text-xs text-slate-400">{a.notes}</p>}
-                {session?.role === "owner" && (
+                {session && canManage(session.role) && (
                   <div className="mt-3 flex gap-1 border-t border-slate-100 pt-2">
                     <Button variant="ghost" className="px-2 py-1 text-xs" onClick={() => openEdit(a)}>
                       <Pencil className="h-3.5 w-3.5" /> {t("edit")}

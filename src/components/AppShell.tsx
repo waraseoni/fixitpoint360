@@ -10,6 +10,7 @@ import {
   Wrench,
   ShieldCheck,
   UserCog,
+  UsersRound,
   CalendarCheck2,
   Banknote,
   CarFront,
@@ -25,19 +26,21 @@ import {
 import { useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/components/ui";
+import { canAccess, roleLabel } from "@/lib/roles";
 import type { TKey } from "@/lib/i18n";
 
-const NAV: { href: string; key: TKey; icon: ReactNode; ownerOnly?: boolean }[] = [
+const NAV: { href: string; key: TKey; icon: ReactNode }[] = [
   { href: "/app/dashboard", key: "dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+  { href: "/app/users", key: "users", icon: <UserCog className="h-4 w-4" /> },
   { href: "/app/clients", key: "clients", icon: <Users className="h-4 w-4" /> },
   { href: "/app/jobs", key: "jobs", icon: <Wrench className="h-4 w-4" /> },
   { href: "/app/amc", key: "amc", icon: <ShieldCheck className="h-4 w-4" /> },
-  { href: "/app/staff", key: "staff", icon: <UserCog className="h-4 w-4" />, ownerOnly: true },
+  { href: "/app/staff", key: "team", icon: <UsersRound className="h-4 w-4" /> },
   { href: "/app/attendance", key: "attendance", icon: <CalendarCheck2 className="h-4 w-4" /> },
-  { href: "/app/salary", key: "salary", icon: <Banknote className="h-4 w-4" />, ownerOnly: true },
-  { href: "/app/tada", key: "taDa", icon: <CarFront className="h-4 w-4" />, ownerOnly: true },
-  { href: "/app/money", key: "money", icon: <ArrowLeftRight className="h-4 w-4" />, ownerOnly: true },
-  { href: "/app/ledger", key: "ledger", icon: <BookOpenText className="h-4 w-4" />, ownerOnly: true },
+  { href: "/app/tada", key: "taDa", icon: <CarFront className="h-4 w-4" /> },
+  { href: "/app/salary", key: "salary", icon: <Banknote className="h-4 w-4" /> },
+  { href: "/app/money", key: "money", icon: <ArrowLeftRight className="h-4 w-4" /> },
+  { href: "/app/ledger", key: "ledger", icon: <BookOpenText className="h-4 w-4" /> },
   { href: "/app/settings", key: "settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -61,7 +64,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     return null;
   }
 
-  const navItems = NAV.filter((n) => !n.ownerOnly || session.role === "owner");
+  if (!canAccess(session.role, pathname)) {
+    router.replace("/app/dashboard");
+    return null;
+  }
+
+  const navItems = NAV.filter((n) => canAccess(session.role, n.href));
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -107,7 +115,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="absolute inset-x-0 bottom-0 border-t border-slate-200 p-3">
           <div className="mb-2 truncate px-1 text-xs font-medium text-slate-700">
             {session.name}
-            <span className="ml-1 text-[10px] uppercase text-slate-400">({session.role})</span>
+            <span className="ml-1 text-[10px] uppercase text-slate-400">
+              ({roleLabel(session.role, lang)})
+            </span>
           </div>
           <button
             onClick={() => {

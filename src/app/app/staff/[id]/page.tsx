@@ -48,7 +48,7 @@ export default function StaffDetailPage() {
   return (
     <div>
       <Link href="/app/staff" className="mb-3 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-700">
-        <ArrowLeft className="h-4 w-4" /> {t("staff")}
+        <ArrowLeft className="h-4 w-4" /> {t("team")}
       </Link>
 
       <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">

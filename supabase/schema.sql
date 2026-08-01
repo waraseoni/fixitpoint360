@@ -14,7 +14,7 @@ create table if not exists public.profiles (
   name text not null,
   email text not null default '',
   phone text not null default '',
-  role text not null default 'staff' check (role in ('owner', 'staff')),
+  role text not null default 'staff' check (role in ('owner', 'admin', 'staff')),
   designation text not null default '',
   status text not null default 'active' check (status in ('active', 'inactive')),
   salary numeric not null default 0,

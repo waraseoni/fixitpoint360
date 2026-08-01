@@ -8,6 +8,7 @@ import { useStore, getBalance } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
 import { SERVICE_CATEGORIES, JOB_STATUSES, PRIORITIES, PAYMENT_MODES } from "@/lib/constants";
 import { money, formatDate, today } from "@/lib/format";
+import { canManage } from "@/lib/roles";
 import {
   Button,
   Card,
@@ -99,7 +100,7 @@ export default function JobDetailPage() {
             <PaymentBadge value={job.paymentStatus} />
           </div>
         </div>
-        {session?.role === "owner" && (
+        {session && canManage(session.role) && (
           <div className="flex flex-wrap items-center gap-2">
             {job.status === "in_progress" && (
               <Button variant="success" onClick={doMarkCompleted}>

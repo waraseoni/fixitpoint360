@@ -8,6 +8,7 @@ import { useStore, getBalance } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
 import { CLIENT_TYPES, SERVICE_CATEGORIES, PAYMENT_MODES } from "@/lib/constants";
 import { money, formatDate, waLink } from "@/lib/format";
+import { canManage } from "@/lib/roles";
 import {
   Button,
   Card,
@@ -98,7 +99,7 @@ export default function ClientDetailPage() {
           <a href={`tel:${client.phone}`} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             <Phone className="h-4 w-4" /> {t("call")}
           </a>
-          {session?.role === "owner" && (
+          {session && canManage(session.role) && (
             <Button variant="outline" onClick={() => setEntryOpen(true)}>
               <Plus className="h-4 w-4" /> {t("addLedgerEntry")}
             </Button>
@@ -147,7 +148,7 @@ export default function ClientDetailPage() {
                   <Th>{t("debit")}</Th>
                   <Th>{t("credit")}</Th>
                   <Th>{t("balance")}</Th>
-                  {session?.role === "owner" && <Th>{t("actions")}</Th>}
+                  {session && canManage(session.role) && <Th>{t("actions")}</Th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -168,7 +169,7 @@ export default function ClientDetailPage() {
                       <Td className="text-red-600">{e.type === "debit" ? money(e.amount, settings) : "—"}</Td>
                       <Td className="text-emerald-600">{e.type === "credit" ? money(e.amount, settings) : "—"}</Td>
                       <Td className="font-medium">{money(e.balance, settings)}</Td>
-                      {session?.role === "owner" && (
+                      {session && canManage(session.role) && (
                         <Td>
                           <button
                             onClick={() => {

@@ -7,6 +7,7 @@ import type {
   FirmSettings,
   Job,
   LedgerEntry,
+  Role,
   SalaryRecord,
   TaDa,
   Transaction,
@@ -44,7 +45,7 @@ import {
   type TransactionRow,
 } from "./db";
 
-export type Session = { id: string; name: string; email: string; role: "owner" | "staff" } | null;
+export type Session = { id: string; name: string; email: string; role: Role } | null;
 
 interface State extends DB {
   session: Session;

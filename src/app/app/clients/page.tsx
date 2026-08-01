@@ -7,6 +7,7 @@ import { useStore, getBalance } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { CLIENT_TYPES } from "@/lib/constants";
 import { waLink, money } from "@/lib/format";
+import { canManage } from "@/lib/roles";
 import {
   Button,
   Card,
@@ -91,7 +92,7 @@ export default function ClientsPage() {
         title={t("clientList")}
         subtitle={`${clients.length} ${t("total")?.toLowerCase()}`}
         action={
-          session?.role === "owner" && (
+          session && canManage(session.role) && (
             <Button onClick={openAdd}>
               <Plus className="h-4 w-4" />
               {t("addClient")}
@@ -174,7 +175,7 @@ export default function ClientsPage() {
                           <a href={`tel:${c.phone}`} className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50" title={t("call")}>
                             <Phone className="h-4 w-4" />
                           </a>
-                          {session?.role === "owner" && (
+                          {session && canManage(session.role) && (
                             <>
                               <button onClick={() => openEdit(c)} className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100">
                                 <Pencil className="h-4 w-4" />
