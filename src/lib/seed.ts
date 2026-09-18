@@ -322,4 +322,7 @@ export const seedDB: DB = {
   ledger,
   settings: firm,
   jobCounter: jobs.length,
+  documents: [],
+  inventory: [],
+  docCounter: 0,
 };

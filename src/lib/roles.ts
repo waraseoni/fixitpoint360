@@ -29,6 +29,8 @@ const PAGE_ACCESS: { prefix: string; roles: Role[] }[] = [
   { prefix: "/app/money", roles: ["owner"] },
   { prefix: "/app/ledger", roles: ["owner"] },
   { prefix: "/app/settings", roles: ["owner"] },
+  { prefix: "/app/documents", roles: ["owner", "admin", "staff"] },
+  { prefix: "/app/inventory", roles: ["owner", "admin", "staff"] },
 ];
 
 export function canAccess(role: Role, pathname: string): boolean {

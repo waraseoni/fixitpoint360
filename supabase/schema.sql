@@ -171,6 +171,45 @@ create table if not exists public.ledger_entries (
 create index if not exists idx_ledger_client on public.ledger_entries(client_id);
 
 -- ------------------------------------------------------------
+-- documents  (bill / invoice / estimate / quotation)
+-- ------------------------------------------------------------
+create table if not exists public.documents (
+  id text primary key,
+  doc_no integer not null,
+  doc_type text not null check (doc_type in ('bill', 'invoice', 'estimate', 'quotation')),
+  client_id text not null references public.clients(id) on delete cascade,
+  job_id text references public.jobs(id) on delete set null,
+  doc_date date not null,
+  valid_until date,
+  items jsonb not null default '[]'::jsonb,
+  discount numeric not null default 0,
+  tax_rate numeric not null default 0,
+  notes text,
+  status text not null default 'draft' check (status in ('draft', 'sent', 'accepted', 'rejected', 'paid', 'cancelled')),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_documents_client on public.documents(client_id);
+create index if not exists idx_documents_type on public.documents(doc_type);
+
+-- ------------------------------------------------------------
+-- inventory
+-- ------------------------------------------------------------
+create table if not exists public.inventory (
+  id text primary key,
+  name text not null,
+  category text not null default 'other',
+  unit text not null default 'pcs',
+  quantity numeric not null default 0,
+  cost_price numeric not null default 0,
+  selling_price numeric not null default 0,
+  reorder_level numeric not null default 0,
+  notes text,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+-- ------------------------------------------------------------
 -- settings  (single row key = 'firm')
 -- ------------------------------------------------------------
 create table if not exists public.settings (
@@ -190,6 +229,8 @@ insert into public.settings (key, value) values ('firm', '{}'::jsonb)
 on conflict (key) do nothing;
 insert into public.app_meta (key, value) values ('job_counter', '0'::jsonb)
 on conflict (key) do nothing;
+insert into public.app_meta (key, value) values ('doc_counter', '0'::jsonb)
+on conflict (key) do nothing;
 
 -- ------------------------------------------------------------
 -- Row Level Security
@@ -205,6 +246,8 @@ alter table public.transactions enable row level security;
 alter table public.ledger_entries enable row level security;
 alter table public.settings enable row level security;
 alter table public.app_meta enable row level security;
+alter table public.documents enable row level security;
+alter table public.inventory enable row level security;
 
 -- Authenticated users can read all profiles; update only their own row.
 -- (insert/delete handled by service role through the /api/admin route)
@@ -219,7 +262,7 @@ create policy "profiles_update_own" on public.profiles
 do $$
 declare tbl text;
 begin
-  foreach tbl in array array['clients','jobs','amcs','attendance','salary_records','tada','transactions','ledger_entries','settings','app_meta']
+  foreach tbl in array array['clients','jobs','amcs','attendance','salary_records','tada','transactions','ledger_entries','settings','app_meta','documents','inventory']
   loop
     execute format('drop policy if exists "all_all" on public.%I', tbl);
     execute format('create policy "all_all" on public.%I for all to authenticated using (true) with check (true)', tbl);

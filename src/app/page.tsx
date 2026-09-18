@@ -14,7 +14,7 @@ import {
   SiteIcon,
   serviceById,
 } from "@/components/site/SiteShell";
-import { btnGhost, btnPrimary, SectionHeading, AmcBanner, CallBand } from "@/components/site/site-ui";
+import { btnGhost, btnPrimary, SectionHeading, AmcBanner, CallBand, MobileRepairAd } from "@/components/site/site-ui";
 
 export default function HomePage() {
   const { lang } = useI18n();
@@ -71,6 +71,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <MobileRepairAd />
 
       <section className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">

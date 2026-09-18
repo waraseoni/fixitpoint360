@@ -22,18 +22,24 @@ import {
   Menu,
   X,
   Wrench as Logo,
+  QrCode as QrIcon,
+  FileText,
+  Package,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/components/ui";
 import { canAccess, roleLabel } from "@/lib/roles";
 import type { TKey } from "@/lib/i18n";
+import { QrModal } from "@/components/QrModal";
 
 const NAV: { href: string; key: TKey; icon: ReactNode }[] = [
   { href: "/app/dashboard", key: "dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: "/app/users", key: "users", icon: <UserCog className="h-4 w-4" /> },
   { href: "/app/clients", key: "clients", icon: <Users className="h-4 w-4" /> },
   { href: "/app/jobs", key: "jobs", icon: <Wrench className="h-4 w-4" /> },
+  { href: "/app/documents", key: "documents", icon: <FileText className="h-4 w-4" /> },
+  { href: "/app/inventory", key: "inventory", icon: <Package className="h-4 w-4" /> },
   { href: "/app/amc", key: "amc", icon: <ShieldCheck className="h-4 w-4" /> },
   { href: "/app/staff", key: "team", icon: <UsersRound className="h-4 w-4" /> },
   { href: "/app/attendance", key: "attendance", icon: <CalendarCheck2 className="h-4 w-4" /> },
@@ -143,6 +149,18 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="truncate text-sm font-semibold text-slate-900">{settings.name}</div>
             <div className="hidden truncate text-xs text-slate-500 sm:block">{settings.address}</div>
           </div>
+          <QrModal
+            title={t("shareWebsite")}
+            caption={t("shareQrCaption")}
+            trigger={
+              <button
+                className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
+                aria-label={t("shareWebsite")}
+              >
+                <QrIcon className="h-4 w-4" />
+              </button>
+            }
+          />
           <button
             onClick={() => setLang(lang === "en" ? "hi" : "en")}
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50"

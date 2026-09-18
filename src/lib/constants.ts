@@ -1,12 +1,38 @@
 import type {
   AttendanceStatus,
   ClientType,
+  DocStatus,
+  DocType,
   JobStatus,
   PaymentMode,
   PaymentStatus,
   Priority,
   ServiceCategory,
 } from "./types";
+
+export const DOC_TYPES: { value: DocType; labelEn: string; labelHi: string }[] = [
+  { value: "bill", labelEn: "Bill", labelHi: "बिल" },
+  { value: "invoice", labelEn: "Invoice", labelHi: "इनवॉइस" },
+  { value: "estimate", labelEn: "Estimate", labelHi: "अनुमान" },
+  { value: "quotation", labelEn: "Quotation", labelHi: "कोटेशन" },
+];
+
+export const DOC_STATUSES: { value: DocStatus; labelEn: string; labelHi: string }[] = [
+  { value: "draft", labelEn: "Draft", labelHi: "ड्राफ्ट" },
+  { value: "sent", labelEn: "Sent", labelHi: "भेजा गया" },
+  { value: "accepted", labelEn: "Accepted", labelHi: "स्वीकृत" },
+  { value: "rejected", labelEn: "Rejected", labelHi: "अस्वीकृत" },
+  { value: "paid", labelEn: "Paid", labelHi: "भुगतान किया गया" },
+  { value: "cancelled", labelEn: "Cancelled", labelHi: "रद्द" },
+];
+
+export const INVENTORY_CATEGORIES = [
+  { value: "cctv", labelEn: "CCTV & Cameras", labelHi: "सीसीटीवी और कैमरे" },
+  { value: "computer", labelEn: "Computer Parts", labelHi: "कंप्यूटर पार्ट्स" },
+  { value: "printer", labelEn: "Printer & Cartridges", labelHi: "प्रिंटर और कार्ट्रिज" },
+  { value: "household", labelEn: "Household Items", labelHi: "घरेलू सामान" },
+  { value: "other", labelEn: "Other", labelHi: "अन्य" },
+];
 
 export const SERVICE_CATEGORIES: {
   value: ServiceCategory;

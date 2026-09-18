@@ -4,7 +4,9 @@ import type {
   Attendance,
   Client,
   DB,
+  Doc,
   FirmSettings,
+  InventoryItem,
   Job,
   LedgerEntry,
   Role,
@@ -20,6 +22,8 @@ import {
   fromAMC,
   fromAttendance,
   fromClient,
+  fromDoc,
+  fromInventoryItem,
   fromJob,
   fromLedger,
   fromSalary,
@@ -28,6 +32,8 @@ import {
   toAMC,
   toAttendance,
   toClient,
+  toDoc,
+  toInventoryItem,
   toJob,
   toLedger,
   toSalary,
@@ -37,6 +43,8 @@ import {
   type AMCRow,
   type AttendanceRow,
   type ClientRow,
+  type DocRow,
+  type InventoryRow,
   type JobRow,
   type LedgerRow,
   type ProfileRow,
@@ -88,6 +96,15 @@ interface State extends DB {
   addLedgerEntry: (e: Omit<LedgerEntry, "id" | "createdAt">) => Promise<void>;
   deleteLedgerEntry: (id: string) => Promise<void>;
 
+  addDoc: (d: Omit<Doc, "id" | "docNo" | "createdAt">) => Promise<void>;
+  updateDoc: (id: string, patch: Partial<Doc>) => Promise<void>;
+  deleteDoc: (id: string) => Promise<void>;
+
+  addInventoryItem: (i: Omit<InventoryItem, "id" | "createdAt" | "updatedAt">) => Promise<void>;
+  updateInventoryItem: (id: string, patch: Partial<InventoryItem>) => Promise<void>;
+  deleteInventoryItem: (id: string) => Promise<void>;
+  adjustStock: (id: string, quantity: number) => Promise<void>;
+
   updateSettings: (patch: Partial<FirmSettings>) => Promise<void>;
   resetDB: () => Promise<void>;
 }
@@ -138,9 +155,23 @@ function buildJobLedger(job: Job): LedgerEntry[] {
 }
 
 async function all(table: string): Promise<unknown[]> {
-  const { data, error } = await getSupabase().from(table).select("*");
-  if (error) throw error;
-  return (data as unknown[] | null) || [];
+  try {
+    const { data, error } = await getSupabase().from(table).select("*");
+    if (error) throw error;
+    return (data as unknown[] | null) || [];
+  } catch (err) {
+    const msg = (err as { message?: string })?.message || String(err);
+    console.error(`[hydrate] failed to load "${table}":`, msg);
+    throw err;
+  }
+}
+
+async function safe<T = unknown>(table: string): Promise<T[]> {
+  try {
+    return (await all(table)) as T[];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchProfiles(): Promise<User[]> {
@@ -177,6 +208,17 @@ async function persistJobCounter(n: number): Promise<void> {
     .upsert({ key: "job_counter", value: { job_counter: n } });
 }
 
+export function docTotals(d: Pick<Doc, "items" | "discount" | "taxRate">): {
+  subtotal: number;
+  taxAmount: number;
+  total: number;
+} {
+  const subtotal = (d.items || []).reduce((s, it) => s + (it.qty || 0) * (it.rate || 0), 0);
+  const taxAmount = (subtotal * (d.taxRate || 0)) / 100;
+  const total = subtotal - (d.discount || 0) + taxAmount;
+  return { subtotal, taxAmount, total };
+}
+
 export const useStore = create<State>()((set, get) => ({
   ...emptyDB(),
   session: null,
@@ -201,23 +243,26 @@ export const useStore = create<State>()((set, get) => ({
         set({ session: null, ready: true });
         return;
       }
-      const [clients, jobs, amcs, attendance, salary, tada, transactions, ledger, settingsRows, users, counter] =
+      const [clients, jobs, amcs, attendance, salary, tada, transactions, ledger, documents, inventory, settingsRows, users, counter] =
         await Promise.all([
-          all("clients") as Promise<ClientRow[]>,
-          all("jobs") as Promise<JobRow[]>,
-          all("amcs") as Promise<AMCRow[]>,
-          all("attendance") as Promise<AttendanceRow[]>,
-          all("salary_records") as Promise<SalaryRow[]>,
-          all("tada") as Promise<TaDaRow[]>,
-          all("transactions") as Promise<TransactionRow[]>,
-          all("ledger_entries") as Promise<LedgerRow[]>,
-          all("settings"),
+          safe<ClientRow>("clients"),
+          safe<JobRow>("jobs"),
+          safe<AMCRow>("amcs"),
+          safe<AttendanceRow>("attendance"),
+          safe<SalaryRow>("salary_records"),
+          safe<TaDaRow>("tada"),
+          safe<TransactionRow>("transactions"),
+          safe<LedgerRow>("ledger_entries"),
+          safe<DocRow>("documents"),
+          safe<InventoryRow>("inventory"),
+          safe("settings"),
           fetchProfiles(),
           fetchJobCounter(),
         ]);
       const firmRow = (settingsRows as { key: string; value?: unknown }[]).find((s) => s.key === "firm");
       const firm = (firmRow?.value || {}) as Partial<FirmSettings>;
       const u = toUser(profile as ProfileRow);
+      const docCounter = (documents as DocRow[]).reduce((max, r) => Math.max(max, r.doc_no), 0);
       set({
         ...emptyDB(),
         users,
@@ -229,8 +274,11 @@ export const useStore = create<State>()((set, get) => ({
         tada: tada.map(toTaDa),
         transactions: transactions.map(toTransaction),
         ledger: ledger.map(toLedger),
+        documents: documents.map(toDoc),
+        inventory: inventory.map(toInventoryItem),
         settings: { ...emptyDB().settings, ...firm },
         jobCounter: counter,
+        docCounter,
         session: { id: u.id, name: u.name, email: u.email, role: u.role },
         ready: true,
       });
@@ -677,10 +725,99 @@ export const useStore = create<State>()((set, get) => ({
     }
   },
 
+  addDoc: async (d) => {
+    const s = get();
+    const docNo = s.docCounter + 1;
+    const doc: Doc = {
+      ...d,
+      id: uid("d"),
+      docNo,
+      items: d.items || [],
+      discount: d.discount || 0,
+      taxRate: d.taxRate || 0,
+      createdAt: toISO(new Date()),
+    };
+    try {
+      const sup = getSupabase();
+      await sup.from("documents").insert(fromDoc(doc));
+      await getSupabase().from("app_meta").upsert({ key: "doc_counter", value: { doc_counter: docNo } });
+      set((st) => ({ documents: [...st.documents, doc], docCounter: docNo }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  updateDoc: async (id, patch) => {
+    const current = get().documents.find((d) => d.id === id);
+    if (!current) return;
+    const updated = { ...current, ...patch };
+    try {
+      await getSupabase().from("documents").update(fromDoc(updated)).eq("id", id);
+      set((st) => ({ documents: st.documents.map((d) => (d.id === id ? updated : d)) }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  deleteDoc: async (id) => {
+    try {
+      await getSupabase().from("documents").delete().eq("id", id);
+      set((st) => ({ documents: st.documents.filter((d) => d.id !== id) }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  addInventoryItem: async (i) => {
+    const now = toISO(new Date());
+    const item: InventoryItem = { ...i, id: uid("inv"), createdAt: now, updatedAt: now };
+    try {
+      await getSupabase().from("inventory").insert(fromInventoryItem(item));
+      set((st) => ({ inventory: [...st.inventory, item] }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  updateInventoryItem: async (id, patch) => {
+    const current = get().inventory.find((i) => i.id === id);
+    if (!current) return;
+    const updated = { ...current, ...patch, updatedAt: toISO(new Date()) };
+    try {
+      await getSupabase().from("inventory").update(fromInventoryItem(updated)).eq("id", id);
+      set((st) => ({ inventory: st.inventory.map((i) => (i.id === id ? updated : i)) }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  deleteInventoryItem: async (id) => {
+    try {
+      await getSupabase().from("inventory").delete().eq("id", id);
+      set((st) => ({ inventory: st.inventory.filter((i) => i.id !== id) }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  adjustStock: async (id, quantity) => {
+    const current = get().inventory.find((i) => i.id === id);
+    if (!current) return;
+    const updated = { ...current, quantity: current.quantity + quantity, updatedAt: toISO(new Date()) };
+    try {
+      await getSupabase().from("inventory").update(fromInventoryItem(updated)).eq("id", id);
+      set((st) => ({ inventory: st.inventory.map((i) => (i.id === id ? updated : i)) }));
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
   resetDB: async () => {
     try {
       const sup = getSupabase();
       await Promise.all([
+        sup.from("documents").delete().neq("id", ""),
+        sup.from("inventory").delete().neq("id", ""),
         sup.from("ledger_entries").delete().neq("id", ""),
         sup.from("transactions").delete().neq("id", ""),
         sup.from("salary_records").delete().neq("id", ""),

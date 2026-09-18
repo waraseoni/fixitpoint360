@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ArrowLeft, CheckCircle2, XCircle, Banknote } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, CheckCircle2, XCircle, Banknote, FileText, ShieldCheck } from "lucide-react";
 import { useStore, getBalance } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
 import { SERVICE_CATEGORIES, JOB_STATUSES, PRIORITIES, PAYMENT_MODES } from "@/lib/constants";
@@ -26,6 +26,7 @@ import type { Job } from "@/lib/types";
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const {
     jobs,
     clients,
@@ -117,6 +118,12 @@ export default function JobDetailPage() {
                 <Banknote className="h-4 w-4" /> {t("recordPayment")}
               </Button>
             )}
+            <Button variant="outline" onClick={() => router.push(`/app/documents?new=invoice&client=${job.clientId}&job=${job.id}`)}>
+              <FileText className="h-4 w-4" /> {t("makeInvoice")}
+            </Button>
+            <Button variant="outline" onClick={() => router.push(`/app/documents?new=quotation&client=${job.clientId}&job=${job.id}`)}>
+              <ShieldCheck className="h-4 w-4" /> {t("makeQuotation")}
+            </Button>
           </div>
         )}
       </div>

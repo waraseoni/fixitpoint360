@@ -9,6 +9,7 @@ import {
   Printer,
   Home as HomeIcon,
   PackageSearch,
+  Smartphone,
   Clock,
   IndianRupee,
   ShieldCheck,
@@ -23,9 +24,11 @@ import {
   Wrench,
   Headset,
   BadgeCheck,
+  QrCode as QrIcon,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { siteContent, type ServiceInfo } from "./siteContent";
+import { QrModal } from "@/components/QrModal";
 
 const ICONS: Record<string, typeof Cctv> = {
   cctv: Cctv,
@@ -43,6 +46,7 @@ const ICONS: Record<string, typeof Cctv> = {
   message: MessageCircle,
   mail: Mail,
   map: MapPin,
+  mobile: Smartphone,
 };
 
 export function SiteIcon({
@@ -115,6 +119,18 @@ function Navbar() {
           })}
         </div>
         <div className="hidden items-center gap-3 lg:flex">
+          <QrModal
+            title={c.nav.qr}
+            caption={c.nav.qrShare}
+            trigger={
+              <button
+                className="flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
+                aria-label={c.nav.qr}
+              >
+                <QrIcon className="h-4 w-4" />
+              </button>
+            }
+          />
           <button
             onClick={toggleLang}
             className="flex items-center gap-1.5 rounded-lg border border-white/15 px-3 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-white/10"
@@ -130,6 +146,18 @@ function Navbar() {
           </Link>
         </div>
         <div className="flex items-center gap-2 lg:hidden">
+          <QrModal
+            title={c.nav.qr}
+            caption={c.nav.qrShare}
+            trigger={
+              <button
+                className="flex items-center gap-1 rounded-lg border border-white/15 px-2.5 py-2 text-sm font-medium text-slate-200"
+                aria-label={c.nav.qr}
+              >
+                <QrIcon className="h-4 w-4" />
+              </button>
+            }
+          />
           <button
             onClick={toggleLang}
             className="flex items-center gap-1 rounded-lg border border-white/15 px-2.5 py-2 text-sm font-medium text-slate-200"

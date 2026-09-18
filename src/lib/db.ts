@@ -3,7 +3,10 @@ import type {
   Attendance,
   Client,
   DB,
+  Doc,
+  DocItem,
   FirmSettings,
+  InventoryItem,
   Job,
   LedgerEntry,
   SalaryRecord,
@@ -134,6 +137,36 @@ export type LedgerRow = {
   ref_id: string | null;
   description: string;
   mode: LedgerEntry["mode"];
+  created_at: string;
+};
+
+export type DocRow = {
+  id: string;
+  doc_no: number;
+  doc_type: Doc["docType"];
+  client_id: string;
+  job_id: string | null;
+  doc_date: string;
+  valid_until: string | null;
+  items: DocItem[];
+  discount: number;
+  tax_rate: number;
+  notes: string | null;
+  status: Doc["status"];
+  created_at: string;
+};
+
+export type InventoryRow = {
+  id: string;
+  name: string;
+  category: string;
+  unit: string;
+  quantity: number;
+  cost_price: number;
+  selling_price: number;
+  reorder_level: number;
+  notes: string | null;
+  updated_at: string;
   created_at: string;
 };
 
@@ -376,6 +409,66 @@ export const fromLedger = (e: LedgerEntry): LedgerRow => ({
   created_at: e.createdAt,
 });
 
+export const toDoc = (r: DocRow): Doc => ({
+  id: r.id,
+  docNo: r.doc_no,
+  docType: r.doc_type,
+  clientId: r.client_id,
+  jobId: r.job_id || undefined,
+  date: r.doc_date,
+  validUntil: r.valid_until || undefined,
+  items: Array.isArray(r.items) ? r.items : [],
+  discount: num(r.discount),
+  taxRate: num(r.tax_rate),
+  notes: r.notes || undefined,
+  status: r.status,
+  createdAt: r.created_at,
+});
+
+export const fromDoc = (d: Doc): DocRow => ({
+  id: d.id,
+  doc_no: d.docNo,
+  doc_type: d.docType,
+  client_id: d.clientId,
+  job_id: d.jobId || null,
+  doc_date: d.date,
+  valid_until: d.validUntil || null,
+  items: d.items,
+  discount: d.discount || 0,
+  tax_rate: d.taxRate || 0,
+  notes: d.notes || null,
+  status: d.status,
+  created_at: d.createdAt,
+});
+
+export const toInventoryItem = (r: InventoryRow): InventoryItem => ({
+  id: r.id,
+  name: r.name,
+  category: r.category,
+  unit: r.unit,
+  quantity: num(r.quantity),
+  costPrice: num(r.cost_price),
+  sellingPrice: num(r.selling_price),
+  reorderLevel: num(r.reorder_level),
+  notes: r.notes || undefined,
+  updatedAt: r.updated_at,
+  createdAt: r.created_at,
+});
+
+export const fromInventoryItem = (i: InventoryItem): InventoryRow => ({
+  id: i.id,
+  name: i.name,
+  category: i.category,
+  unit: i.unit,
+  quantity: i.quantity || 0,
+  cost_price: i.costPrice || 0,
+  selling_price: i.sellingPrice || 0,
+  reorder_level: i.reorderLevel || 0,
+  notes: i.notes || null,
+  updated_at: i.updatedAt,
+  created_at: i.createdAt,
+});
+
 export const defaultSettings: FirmSettings = {
   name: "FixitPoint360",
   tagline: "Complete IT & Home Services",
@@ -396,6 +489,9 @@ export const emptyDB = (): DB => ({
   tada: [],
   transactions: [],
   ledger: [],
+  documents: [],
+  inventory: [],
   settings: { ...defaultSettings },
   jobCounter: 0,
+  docCounter: 0,
 });

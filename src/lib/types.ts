@@ -160,6 +160,46 @@ export interface FirmSettings {
   currency: string;
 }
 
+export type DocType = "bill" | "invoice" | "estimate" | "quotation";
+export type DocStatus = "draft" | "sent" | "accepted" | "rejected" | "paid" | "cancelled";
+
+export interface DocItem {
+  id: string;
+  description: string;
+  qty: number;
+  rate: number;
+}
+
+export interface Doc {
+  id: string;
+  docNo: number;
+  docType: DocType;
+  clientId: string;
+  jobId?: string;
+  date: string;
+  validUntil?: string;
+  items: DocItem[];
+  discount: number;
+  taxRate: number;
+  notes?: string;
+  status: DocStatus;
+  createdAt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  category: string;
+  unit: string;
+  quantity: number;
+  costPrice: number;
+  sellingPrice: number;
+  reorderLevel: number;
+  notes?: string;
+  updatedAt: string;
+  createdAt: string;
+}
+
 export interface DB {
   users: User[];
   clients: Client[];
@@ -170,6 +210,9 @@ export interface DB {
   tada: TaDa[];
   transactions: Transaction[];
   ledger: LedgerEntry[];
+  documents: Doc[];
+  inventory: InventoryItem[];
   settings: FirmSettings;
   jobCounter: number;
+  docCounter: number;
 }

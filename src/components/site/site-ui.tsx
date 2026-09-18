@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Phone, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Phone,
+  MessageCircle,
+  Smartphone,
+  Zap,
+  CheckCircle2,
+  ShieldCheck,
+} from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { siteContent } from "./siteContent";
 
@@ -145,6 +153,88 @@ export function AmcBanner() {
               {c.amcBanner.cta}
               <ArrowRight className="h-4 w-4" />
             </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function MobileRepairAd() {
+  const { lang } = useI18n();
+  const c = siteContent[lang];
+  const ad = c.mobileRepairAd;
+  return (
+    <section className="bg-slate-950 py-16 sm:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-emerald-600 via-teal-600 to-cyan-600">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 -right-20 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
+            <div className="absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-slate-950/30 blur-3xl" />
+          </div>
+          <div className="relative grid gap-8 px-6 py-12 sm:px-12 sm:py-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+                <Zap className="h-3.5 w-3.5 text-yellow-300" />
+                {ad.badge}
+              </span>
+              <h2 className="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                {ad.heading}{" "}
+                <span className="bg-linear-to-r from-yellow-200 via-white to-emerald-100 bg-clip-text text-transparent">
+                  {ad.headingAccent}
+                </span>
+              </h2>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-teal-50/90">
+                {ad.sub}
+              </p>
+              <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+                {ad.points.map((p) => (
+                  <li
+                    key={p}
+                    className="flex items-start gap-2 text-sm text-teal-50"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-yellow-300" />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-emerald-700 shadow-lg transition-all hover:-translate-y-0.5"
+                >
+                  {ad.cta}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href={`tel:+91${c.phone}`}
+                  className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
+                >
+                  <Phone className="h-4 w-4" />
+                  {ad.ctaSecondary}
+                </a>
+              </div>
+            </div>
+            <div className="relative hidden justify-center lg:flex">
+              <div className="relative">
+                <div className="flex h-72 w-40 flex-col items-center justify-center rounded-[2rem] border border-white/30 bg-slate-950/40 p-4 shadow-2xl backdrop-blur-sm">
+                  <div className="mb-3 h-1.5 w-10 rounded-full bg-white/20" />
+                  <div className="flex h-44 w-28 items-center justify-center rounded-2xl bg-linear-to-br from-slate-800 to-slate-900">
+                    <div className="relative flex h-24 w-24 items-center justify-center">
+                      <div className="absolute inset-0 rounded-2xl bg-white/10 blur-md" />
+                      <Smartphone className="relative h-12 w-12 text-white" />
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center gap-2 rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-semibold text-emerald-100">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    <span className="uppercase tracking-wider">24 hr fix</span>
+                  </div>
+                </div>
+                <div className="absolute -right-6 top-6 flex h-14 w-14 items-center justify-center rounded-full bg-yellow-300 shadow-lg">
+                  <Zap className="h-6 w-6 text-slate-900" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

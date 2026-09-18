@@ -36,6 +36,8 @@ export interface SiteText {
     contact: string;
     login: string;
     app: string;
+    qr: string;
+    qrShare: string;
   };
   hero: {
     badge: string;
@@ -52,6 +54,16 @@ export interface SiteText {
     heading: string;
     sub: string;
     items: { icon: string; title: string; desc: string }[];
+  };
+  mobileRepairAd: {
+    badge: string;
+    heading: string;
+    headingAccent: string;
+    sub: string;
+    points: string[];
+    cta: string;
+    ctaSecondary: string;
+    phoneLabel: string;
   };
   amcBanner: { heading: string; sub: string; cta: string };
   ctaBand: { heading: string; sub: string; call: string; whatsapp: string };
@@ -128,6 +140,8 @@ const en: SiteText = {
     contact: "Contact",
     login: "Login",
     app: "Open App",
+    qr: "QR Code",
+    qrShare: "Scan to share this website",
   },
   hero: {
     badge: "Trusted by 100+ families & businesses",
@@ -285,6 +299,21 @@ const en: SiteText = {
         desc: "AMC plans cut repair costs by up to 30%.",
       },
     ],
+  },
+  mobileRepairAd: {
+    badge: "New · Same Day Mobile Repair",
+    heading: "Dead phone? Cracked screen?",
+    headingAccent: "We get it back to life — today.",
+    sub: "Screen, battery, charging port, software or water damage — most repairs are done the same day with genuine parts and warranty.",
+    points: [
+      "Same day repair for common faults",
+      "Screen & battery replacement",
+      "Charging & data recovery",
+      "Genuine parts with warranty",
+    ],
+    cta: "Book a Repair",
+    ctaSecondary: "Call Now",
+    phoneLabel: "Call us on",
   },
   amcBanner: {
     heading: "Preventive Maintenance, Zero Surprises",
@@ -471,6 +500,8 @@ const hi: SiteText = {
     contact: "संपर्क",
     login: "लॉगिन",
     app: "ऐप खोलें",
+    qr: "क्यूआर कोड",
+    qrShare: "इस वेबसाइट को साझा करने के लिए स्कैन करें",
   },
   hero: {
     badge: "100+ परिवारों और व्यवसायों का भरोसा",
@@ -628,6 +659,21 @@ const hi: SiteText = {
         desc: "एएमसी योजनाएँ मरम्मत लागत में 30% तक बचत कराती हैं।",
       },
     ],
+  },
+  mobileRepairAd: {
+    badge: "नया · सेम डे मोबाइल रिपेयर",
+    heading: "फोन बंद है? स्क्रीन टूटी है?",
+    headingAccent: "हम आज ही चालू कर देंगे।",
+    sub: "स्क्रीन, बैटरी, चार्जिंग पोर्ट, सॉफ्टवेयर या पानी का नुकसान — ज़्यादातर मरम्मत उसी दिन असली पार्ट्स और वारंटी के साथ हो जाती है।",
+    points: [
+      "सामान्य खराबी की उसी दिन मरम्मत",
+      "स्क्रीन और बैटरी बदलना",
+      "चार्जिंग और डेटा रिकवरी",
+      "असली पार्ट्स और वारंटी",
+    ],
+    cta: "रिपेयर बुक करें",
+    ctaSecondary: "कॉल करें",
+    phoneLabel: "हमें कॉल करें",
   },
   amcBanner: {
     heading: "प्रीवेंटिव मेंटेनेंस, कोई अप्रत्याशित खर्च नहीं",
