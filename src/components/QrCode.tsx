@@ -1,8 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, Link2, Check } from "lucide-react";
+
+function subscribeOrigin(): () => void {
+  return () => {};
+}
+function getOriginSnapshot(): string {
+  return typeof window === "undefined" ? "" : window.location.origin;
+}
+function getOriginServerSnapshot(): string {
+  return "";
+}
 
 export function QrCode({
   url,
@@ -18,12 +28,8 @@ export function QrCode({
   caption?: string;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
-  const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
+  const origin = useSyncExternalStore(subscribeOrigin, getOriginSnapshot, getOriginServerSnapshot);
 
   const target = url || origin;
   const ready = target.length > 0;

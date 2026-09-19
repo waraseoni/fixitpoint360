@@ -10,6 +10,9 @@ import {
   ShieldCheck,
   UserCog,
   ArrowRight,
+  Plus,
+  FileText,
+  Package,
 } from "lucide-react";
 import { useStore, getBalance } from "@/lib/store";
 import { useI18n, categoryLabel } from "@/lib/i18n";
@@ -48,6 +51,21 @@ export default function DashboardPage() {
           {t("welcome")}, {session?.name.split(" ")[0]} 👋
         </h1>
         <p className="text-sm text-slate-500">{t("overview")}</p>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Link href="/app/jobs" className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700">
+          <Plus className="h-4 w-4" /> {t("addJob")}
+        </Link>
+        <Link href="/app/clients" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Plus className="h-4 w-4" /> {t("addClient")}
+        </Link>
+        <Link href="/app/documents" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <FileText className="h-4 w-4" /> {t("documents")}
+        </Link>
+        <Link href="/app/inventory" className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+          <Package className="h-4 w-4" /> {t("inventory")}
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

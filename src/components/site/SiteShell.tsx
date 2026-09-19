@@ -29,6 +29,8 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { siteContent, type ServiceInfo } from "./siteContent";
 import { QrModal } from "@/components/QrModal";
+import { ThemeSelector } from "@/components/ThemeSelector";
+
 
 const ICONS: Record<string, typeof Cctv> = {
   cctv: Cctv,
@@ -119,6 +121,7 @@ function Navbar() {
           })}
         </div>
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeSelector />
           <QrModal
             title={c.nav.qr}
             caption={c.nav.qrShare}
@@ -146,6 +149,7 @@ function Navbar() {
           </Link>
         </div>
         <div className="flex items-center gap-2 lg:hidden">
+          <ThemeSelector compact />
           <QrModal
             title={c.nav.qr}
             caption={c.nav.qrShare}
@@ -158,6 +162,7 @@ function Navbar() {
               </button>
             }
           />
+
           <button
             onClick={toggleLang}
             className="flex items-center gap-1 rounded-lg border border-white/15 px-2.5 py-2 text-sm font-medium text-slate-200"

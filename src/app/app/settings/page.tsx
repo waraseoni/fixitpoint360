@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Save, RefreshCcw, Building2, Languages } from "lucide-react";
+import { Save, RefreshCcw, Building2, Languages, Sun, Moon, Laptop, Palette, Check } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useI18n } from "@/lib/i18n";
+import { useTheme, COLOR_OPTIONS, type ThemeMode } from "@/lib/theme";
 import { roleLabel } from "@/lib/roles";
-import { Button, Card, CardHeader, Input, Field, PageTitle, EmptyState } from "@/components/ui";
+import { Button, Card, CardHeader, Input, Field, PageTitle, EmptyState, cn } from "@/components/ui";
 
 export default function SettingsPage() {
   const { settings, session, updateSettings, resetDB } = useStore();
   const { t, lang, setLang } = useI18n();
+  const { mode, resolvedMode, color, setMode, setColor } = useTheme();
   const [form, setForm] = useState({ ...settings });
   const [saved, setSaved] = useState(false);
 
@@ -25,6 +27,12 @@ export default function SettingsPage() {
     updateSettings(form);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const modeIcons = {
+    light: Sun,
+    dark: Moon,
+    system: Laptop,
   };
 
   return (
@@ -71,6 +79,82 @@ export default function SettingsPage() {
 
         <div className="space-y-6">
           <Card>
+            <CardHeader
+
+              title={t("appearance")}
+              subtitle={t("themeSubtitle")}
+              action={
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                  <Palette className="h-4 w-4" />
+                  <span className="capitalize">({resolvedMode})</span>
+                </div>
+              }
+            />
+            <div className="space-y-4 p-4">
+              <div>
+                <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  {t("themeMode")}
+                </label>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {(["light", "system", "dark"] as ThemeMode[]).map((m) => {
+                    const Icon = modeIcons[m];
+                    const active = mode === m;
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMode(m)}
+                        className={cn(
+                          "flex items-center justify-center gap-2 rounded-lg border p-2.5 text-xs font-medium transition-all",
+                          active
+                            ? "border-indigo-600 dark:border-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 shadow-xs"
+                            : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{t(m === "light" ? "modeLight" : m === "dark" ? "modeDark" : "modeSystem")}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  {t("themeColor")}
+                </label>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {COLOR_OPTIONS.map((c) => {
+                    const isSelected = color === c.id;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setColor(c.id)}
+                        className={cn(
+                          "flex items-center gap-2.5 rounded-lg border p-2 text-left text-xs transition-all",
+                          isSelected
+                            ? "border-slate-900 dark:border-slate-100 bg-slate-100/90 dark:bg-slate-800 font-semibold shadow-xs"
+                            : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        )}
+                      >
+                        <span
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white shadow-xs"
+                          style={{ backgroundColor: c.primary }}
+                        >
+                          {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
+                        </span>
+                        <span className="truncate">{c.name[lang]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
             <CardHeader title={t("language")} />
             <div className="flex gap-2 p-4">
               <Button variant={lang === "en" ? "primary" : "outline"} onClick={() => setLang("en")}>
@@ -81,6 +165,7 @@ export default function SettingsPage() {
               </Button>
             </div>
           </Card>
+
 
           <Card>
             <CardHeader title={t("dangerZone")} />

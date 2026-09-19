@@ -1,9 +1,45 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 
 export type Lang = "en" | "hi";
+
+const STORAGE_KEY = "fixitpoint360-lang";
+
+function readLang(): Lang {
+  if (typeof window === "undefined") return "en";
+  const saved = window.localStorage.getItem(STORAGE_KEY);
+  return saved === "hi" || saved === "en" ? saved : "en";
+}
+
+let langValue: Lang = readLang();
+const listeners = new Set<() => void>();
+
+function subscribe(cb: () => void): () => void {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}
+
+function getLangSnapshot(): Lang {
+  return langValue;
+}
+
+function getLangServerSnapshot(): Lang {
+  return "en";
+}
+
+function notify() {
+  listeners.forEach((cb) => cb());
+}
+
+function setLangValue(l: Lang) {
+  langValue = l;
+  window.localStorage.setItem(STORAGE_KEY, l);
+  notify();
+}
 
 const dict = {
   appName: { en: "FixitPoint360", hi: "फिक्सिटपॉइंट360" },
@@ -77,6 +113,15 @@ const dict = {
   optional: { en: "Optional", hi: "वैकल्पिक" },
 
   overview: { en: "Overview", hi: "अवलोकन" },
+  groupCustomers: { en: "Customers", hi: "ग्राहक" },
+  groupServices: { en: "Services", hi: "सेवाएँ" },
+  groupTeam: { en: "Team", hi: "टीम" },
+  groupFinance: { en: "Finance", hi: "वित्त" },
+  groupSystem: { en: "System", hi: "सिस्टम" },
+  moreMenu: { en: "Menu", hi: "मेन्यू" },
+  collapse: { en: "Collapse", hi: "बंद करें" },
+  expand: { en: "Expand", hi: "खोलें" },
+  quickActions: { en: "Quick Actions", hi: "त्वरित कार्रवाई" },
   shareWebsite: { en: "Share Website", hi: "वेबसाइट साझा करें" },
   shareQrCaption: { en: "Scan this QR to share the website URL with customers", hi: "ग्राहकों के साथ वेबसाइट यूआरएल साझा करने के लिए यह क्यूआर स्कैन करें" },
   totalClients: { en: "Total Clients", hi: "कुल ग्राहक" },
@@ -263,6 +308,14 @@ const dict = {
   invValue: { en: "Stock Value", hi: "स्टॉक मूल्य" },
   thanksForBusiness: { en: "Thank you for your business!", hi: "आपके व्यवसाय के लिए धन्यवाद!" },
   phoneLabel: { en: "Phone", hi: "फोन" },
+
+  appearance: { en: "Appearance & Theme", hi: "थीम एवं रंग रूप" },
+  themeMode: { en: "Theme Mode", hi: "थीम मोड" },
+  themeColor: { en: "Accent Color", hi: "एक्सेंट रंग" },
+  modeLight: { en: "Light", hi: "लाइट" },
+  modeDark: { en: "Dark", hi: "डार्क" },
+  modeSystem: { en: "System", hi: "सिस्टम" },
+  themeSubtitle: { en: "Customize light/dark mode and color accent across the system", hi: "सिस्टम भर में लाइट/डार्क मोड और एक्सेंट रंग कस्टमाइज़ करें" },
 } as const;
 
 export type TKey = keyof typeof dict;
@@ -278,15 +331,10 @@ interface I18nCtx {
 const Ctx = createContext<I18nCtx>({ lang: "en", setLang: () => {}, t: (k) => dict[k].en });
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>(() => {
-    if (typeof window === "undefined") return "en";
-    const saved = window.localStorage.getItem("fixitpoint360-lang");
-    return saved === "hi" || saved === "en" ? saved : "en";
-  });
+  const lang = useSyncExternalStore(subscribe, getLangSnapshot, getLangServerSnapshot);
 
   const changeLang = (l: Lang) => {
-    setLang(l);
-    window.localStorage.setItem("fixitpoint360-lang", l);
+    setLangValue(l);
   };
 
   const t: TFunc = (k) => dict[k][lang];
